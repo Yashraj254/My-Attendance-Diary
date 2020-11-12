@@ -108,9 +108,11 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
                             Log.d(TAG, "onClick: " + date + " has been added to " + table_name);
                             getData();
                             adapter.notifyDataSetChanged();
+                            fab.setVisibility(View.GONE);
                         } else {
                             Toast.makeText(getApplicationContext(), "Can't be added", Toast.LENGTH_LONG).show();
                         }
+
                     }
                 }, year, month, day);
                 pickerDialog.show();
@@ -126,13 +128,14 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
     }
 
     public void setAdapter() {
-        adapter = new MyAdapter(userList, this, this, this, newTable);
+        adapter = new MyAdapter(userList, this, this, this, newTable,fab);
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
         new ItemTouchHelper(callback).attachToRecyclerView(recyclerView);
         SpacingDecorator decorator = new SpacingDecorator(10);
         recyclerView.addItemDecoration(decorator);
+
         recyclerView.setAdapter(adapter);
     }
 
@@ -173,10 +176,12 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
                 detail = "Your attendance is above 75%, Keep up!!!";
 
             detailedView.setText(detail);
+            db.updateData(totalCount, table_name, totalPresent, totalAbsent, totalPercentage);
+
+        } catch (Exception e) {
 
             db.updateData(totalCount, table_name, totalPresent, totalAbsent, totalPercentage);
-        } catch (Exception e) {
-            db.updateData(totalCount, table_name, totalPresent, totalAbsent, totalPercentage);
+
         }
     }
 
@@ -193,16 +198,17 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
             date = userList.get(item).getDate();
             new AlertDialog.Builder(MainActivity2.this).
                     setIcon(android.R.drawable.ic_delete).
-                    setTitle("Are your sure ").
-                    setMessage("You want to delete this item").
+                    setTitle("Delete").
+                    setMessage("Are you sure you want to delete this item.\nYou cannot undo this process.").
                     setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             try {
                                 db.deleteItem(table_name, date.trim());
                                 userList.remove(item);
-                                adapter.notifyItemRemoved(item);
-                               // getData();
+                                getData();
+                                fab.setVisibility(View.VISIBLE);
+                                adapter.notifyDataSetChanged();
                             } catch (Exception e) {
                             }
                         }

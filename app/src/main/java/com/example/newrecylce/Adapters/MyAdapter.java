@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.newrecylce.Models.Model;
 import com.example.newrecylce.R;
 import com.example.newrecylce.Room.DbHelper;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
@@ -35,15 +36,16 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     Context context;
     Model model;
     int status, totalCount, totalPresent, totalAbsent, totalPercentage;
+    FloatingActionButton fab;
 
-    public MyAdapter(ArrayList<Model> userList, onClickListener clickListener, onLongClickListener longClickListener, Context context, String table_name) {
+    public MyAdapter(ArrayList<Model> userList, onClickListener clickListener, onLongClickListener longClickListener, Context context, String table_name, FloatingActionButton fab) {
 
         this.userList = userList;
         this.context = context;
         this.table_name = table_name;
         this.clickListener = clickListener;
         this.longClickListener = longClickListener;
-
+        this.fab = fab;
         db = new DbHelper(context);
     }
 
@@ -110,6 +112,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                         db.addDateData(date, status);
                         getData();
                         holder.absent.setEnabled(false);
+                        fab.setVisibility(View.VISIBLE);
                         break;
                     case R.id.absent:
                         status = 2;
@@ -117,6 +120,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                         db.addDateData(date, status);
                         getData();
                         holder.present.setEnabled(false);
+                        fab.setVisibility(View.VISIBLE);
                         break;
                 }
             }
@@ -142,8 +146,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                 detail = "Your attendance is above 75%, Keep up!!!";
 
             detailedView.setText(detail);
+
             Log.d(TAG, "Total Count: "+totalCount+" Total Present: "+totalPresent+" Total Absent: "+totalAbsent);
             db.updateData(totalCount, newTable, totalPresent, totalAbsent, totalPercentage);
+
         } catch (Exception e) {
             Log.d(TAG, "Table name: "+table_name+" Total Count: "+totalCount+" Total Present: "+totalPresent+" Total Absent: "+totalAbsent);
             db.updateData(totalCount, newTable, totalPresent, totalAbsent, totalPercentage);
