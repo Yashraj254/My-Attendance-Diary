@@ -66,11 +66,14 @@ public class DbHelper extends SQLiteOpenHelper {
             Toast.makeText(context, "Succeed", Toast.LENGTH_SHORT).show();
     }
 
-    public void insertData(String sub, long total) {
+    public void insertData(String sub, int total,int present,int absent,int percentage) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(subjectName1, sub);
+        values.put(present2, present);
+        values.put(absent3, absent);
         values.put(total4, total);
+        values.put(percentage5, percentage);
         long result = db.insert(TABLE_NAME1, null, values);
         if (result == -1)
             Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
@@ -118,7 +121,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public int getAbsentCount(String tableName) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String countQuery = "SELECT  * FROM " + tableName + " where " + status7 + " = 0";
+        String countQuery = "SELECT  * FROM " + tableName + " where " + status7 + " = 2";
         Cursor cursor = db.rawQuery(countQuery, null);
         return cursor.getCount();
     }

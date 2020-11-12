@@ -11,6 +11,10 @@ public class Model {
         this.date = date;
     }
 
+    public Model(int status) {
+        this.status = status;
+    }
+
     public Model(String date, int status) {
         this.date = date;
         this.status = status;

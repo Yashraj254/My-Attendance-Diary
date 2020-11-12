@@ -1,37 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="#FFFFFF"
     android:weightSum="100">
 
     <TextView
         android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginEnd="15dp"
-        android:layout_marginRight="15dp"
-        android:layout_weight="60"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:gravity="center_horizontal|center_vertical"
         android:text=" Date"
-        android:textSize="18sp" />
+        android:textColor="#D50000"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/radioStatus"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <RadioGroup
         android:id="@+id/radioStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_weight="40"
-        android:gravity="center_horizontal|center_vertical"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <RadioButton
             android:id="@+id/present"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dip"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:checked="false"
             android:gravity="center_horizontal|center_vertical"
             android:text="Present" />
 
@@ -39,11 +42,12 @@
             android:id="@+id/absent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dip"
+            android:layout_marginEnd="52dp"
+            android:layout_marginRight="52dp"
+
             android:gravity="center_horizontal|center_vertical"
             android:text="Absent" />
     </RadioGroup>
 
 
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -35,9 +36,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
 
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         TextView subject, total, present, absent,percentage;
+        ProgressBar percentage_bar;
         private onClickListener clickListener;
         private onLongClickListener longClickListener;
-        Context context;
+
 
         public MyViewHolder(@NonNull final View view, onClickListener clickListener, onLongClickListener longClickListener) {
             super(view);
@@ -49,6 +51,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             present = view.findViewById(R.id.present);
             absent = view.findViewById(R.id.absent);
             percentage = view.findViewById(R.id.percentage);
+            percentage_bar = view.findViewById(R.id.percentage_bar);
             view.setOnClickListener(this);
             view.setOnLongClickListener(this);
         }
@@ -73,7 +76,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         return new MyViewHolder(itemView, clickListener, longClickListener);
     }
 
-
     @Override
     public void onBindViewHolder(@NonNull RecyclerAdapter.MyViewHolder holder, int position) {
 
@@ -87,7 +89,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         holder.total.setText("Total: " + total);
         holder.present.setText("Present: " + present);
         holder.absent.setText("Absent: " + absent);
-        holder.percentage.setText(""+percentage);
+        holder.percentage.setText(""+percentage+"%");
+        holder.percentage_bar.setProgress(percentage);
     }
 
     @Override
@@ -97,11 +100,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
 
     public interface onClickListener {
         void onClick(int position);
-        //   void onUpdate(int position);
     }
 
     public interface onLongClickListener {
         boolean onLongClick(int position);
     }
-
 }
