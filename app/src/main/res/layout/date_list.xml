@@ -120,8 +120,10 @@
         android:layout_margin="30dp"
         android:clickable="true"
         android:src="@drawable/ic_baseline_add_24"
+        app:backgroundTint="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="@+id/recyclerView"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:rippleColor="#D50000" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

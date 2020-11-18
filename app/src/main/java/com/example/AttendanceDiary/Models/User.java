@@ -1,7 +1,7 @@
-package com.example.newrecylce.Models;
+package com.example.AttendanceDiary.Models;
 
 import android.content.Context;
-import com.example.newrecylce.Room.DbHelper;
+import com.example.AttendanceDiary.Room.DbHelper;
 
 public class User  {
 

@@ -1,4 +1,4 @@
-package com.example.newrecylce.Adapters;
+package com.example.AttendanceDiary.Adapters;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,9 +11,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.newrecylce.Models.User;
-import com.example.newrecylce.R;
-import com.example.newrecylce.Room.DbHelper;
+import com.example.AttendanceDiary.Models.User;
+import com.example.AttendanceDiary.R;
+import com.example.AttendanceDiary.Room.DbHelper;
 
 import java.util.ArrayList;
 
@@ -71,7 +71,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
     @NonNull
     @Override
     public RecyclerAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.subject_items, parent, false);
 
         return new MyViewHolder(itemView, clickListener, longClickListener);
     }

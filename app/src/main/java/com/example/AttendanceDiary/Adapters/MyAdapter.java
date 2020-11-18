@@ -1,26 +1,21 @@
-package com.example.newrecylce.Adapters;
+package com.example.AttendanceDiary.Adapters;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.newrecylce.Models.Model;
-import com.example.newrecylce.R;
-import com.example.newrecylce.Room.DbHelper;
+import com.example.AttendanceDiary.Models.Model;
+import com.example.AttendanceDiary.R;
+import com.example.AttendanceDiary.Room.DbHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -86,7 +81,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     @NonNull
     @Override
     public MyAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_items2, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.date_items, parent, false);
         return new MyViewHolder(itemView, clickListener, longClickListener);
     }
 
@@ -108,19 +103,25 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (checkedId) {
                     case R.id.present:
+
                         status = 1;
                         db.addDateData(date, status);
                         getData();
+                        notifyDataSetChanged();
                         holder.absent.setEnabled(false);
                         fab.setVisibility(View.VISIBLE);
+
                         break;
                     case R.id.absent:
+
                         status = 2;
                         model = new Model(status);
                         db.addDateData(date, status);
                         getData();
+                        notifyDataSetChanged();
                         holder.present.setEnabled(false);
                         fab.setVisibility(View.VISIBLE);
+
                         break;
                 }
             }
@@ -133,8 +134,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         totalCount = db.totalCount(table_name);
         totalAbsent = db.getAbsentCount(table_name);
         totalPresent = db.getPresentCount(table_name);
-
         totalPercentage = 0;
+
         String detail;
         try {
             totalPercentage = totalPresent * 100 / totalCount;
@@ -154,6 +155,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             Log.d(TAG, "Table name: "+table_name+" Total Count: "+totalCount+" Total Present: "+totalPresent+" Total Absent: "+totalAbsent);
             db.updateData(totalCount, newTable, totalPresent, totalAbsent, totalPercentage);
         }
+
     }
 
     @Override

@@ -3,22 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/colorPrimary">
-
-    <ImageView
-        android:id="@+id/cancelButton"
-        android:layout_width="58dp"
-        android:layout_height="40dp"
-        android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_baseline_close_24" />
 
     <EditText
         android:id="@+id/editText"
         android:layout_width="0dp"
         android:layout_height="40dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:background="#FFFFFF"
         android:ems="10"
         android:hint="Enter subject..."
@@ -27,18 +20,18 @@
         android:textSize="24sp"
         android:visibility="gone"
         app:layout_constraintEnd_toStartOf="@+id/addButton"
-        app:layout_constraintStart_toEndOf="@+id/cancelButton"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/addButton"
         android:layout_width="70dp"
         android:layout_height="40dp"
-        android:visibility="invisible"
+        android:src="@drawable/ic_baseline_check_24"
 
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_baseline_check_24" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/myAttendance"
@@ -46,9 +39,10 @@
         android:layout_height="40dp"
         android:gravity="center_vertical"
         android:text="My Attendance"
+
         android:textColor="#FFFFFF"
         android:textSize="24sp"
         app:layout_constraintEnd_toStartOf="@+id/addButton"
-        app:layout_constraintStart_toEndOf="@+id/cancelButton"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,13 +1,14 @@
-package com.example.newrecylce;
+package com.example.AttendanceDiary;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -15,23 +16,42 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.newrecylce.Adapters.RecyclerAdapter;
-import com.example.newrecylce.Models.User;
-import com.example.newrecylce.Room.DbHelper;
+import com.example.AttendanceDiary.Adapters.RecyclerAdapter;
+import com.example.AttendanceDiary.Models.User;
+import com.example.AttendanceDiary.Room.DbHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements RecyclerAdapter.onClickListener, RecyclerAdapter.onLongClickListener {
+import static android.content.Context.INPUT_METHOD_SERVICE;
 
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link attendanceFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class attendanceFragment extends Fragment implements RecyclerAdapter.onClickListener, RecyclerAdapter.onLongClickListener{
+
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
+
+    // TODO: Rename and change types of parameters
+    private String mParam1;
+    private String mParam2;
     TextView textView;
     String subName;
     int  item;
@@ -40,27 +60,79 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.o
     EditText editText;
     RecyclerAdapter adapter;
     FloatingActionButton fab;
-    private static final String TAG = "Main Activity";
+    private static final String TAG = "attendanceFragment";
     Intent intent;
     DbHelper db;
     String newTable,table_name;
-    ImageView addButton,cancelButton;
+    ImageView addButton;
     InputMethodManager inputMethodManager;
+    Toolbar toolbar;
+    FragmentTransaction ft;
+    private boolean shouldRefreshOnResume = false;
+    public attendanceFragment() {
+        // Required empty public constructor
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment attendanceFragment.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static attendanceFragment newInstance(String param1, String param2) {
+        attendanceFragment fragment = new attendanceFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.subject_list);
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
 
-        recyclerView = findViewById(R.id.recyclerView);
-        editText = findViewById(R.id.editText);
+
+        }
+    }
+
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_attendance, container, false);
+        recyclerView = view.findViewById(R.id.recyclerView);
+        editText = view.findViewById(R.id.editText);
         subName = editText.getText().toString();
-        fab = findViewById(R.id.floatingActionButton);
-        addButton = findViewById(R.id.addButton);
-        cancelButton = findViewById(R.id.cancelButton);
-        textView = findViewById(R.id.myAttendance);
+        fab = view.findViewById(R.id.floatingActionButton);
+        addButton = view.findViewById(R.id.addButton);
+        textView = view.findViewById(R.id.myAttendance);
+        toolbar = view.findViewById(R.id.toolbar);
 
-        db = new DbHelper(this);
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_baseline_menu_24);
+        AppCompatActivity actionBar = (AppCompatActivity) getActivity();
+        actionBar.setSupportActionBar(toolbar);
+
+        Fragment attendanceFragment = new attendanceFragment();
+     /*   getFragmentManager().beginTransaction()
+                .replace(R.id.container,attendanceFragment,"ATTENDANCE")
+                .addToBackStack("YOUR_SOURCE_FRAGMENT_TAG").commit();*/
+
+        DrawerLayout drawer = (DrawerLayout) actionBar.findViewById(R.id.draw_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                getActivity(), drawer, toolbar, R.string.open, R.string.close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        db = new DbHelper(getContext());
         usersList = new ArrayList<>();
 
         show();
@@ -78,9 +150,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.o
                 int percentage = 0;
                 User user = new User(subName, count, present, absent, percentage);
                 if (subName.trim().isEmpty())
-                    Toast.makeText(MainActivity.this, "Enter something", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Enter something", Toast.LENGTH_SHORT).show();
                 else {
-                  //  subName = subName.replaceAll(" ","");
+                    //  subName = subName.replaceAll(" ","");
                     db.insertData(subName.trim(), count, present, absent, percentage);
                     usersList.add(user);
                     adapter.notifyDataSetChanged();
@@ -90,10 +162,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.o
                 editText.getText().clear();
                 editText.setVisibility(View.INVISIBLE);
                 addButton.setVisibility(View.INVISIBLE);
-                cancelButton.setVisibility(View.INVISIBLE);
                 fab.setVisibility(View.VISIBLE);
                 textView.setVisibility(View.VISIBLE);
-                inputMethodManager =  (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+                inputMethodManager =  (InputMethodManager)getActivity().getSystemService(INPUT_METHOD_SERVICE);
                 inputMethodManager.toggleSoftInputFromWindow(editText.getApplicationWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
                 editText.requestFocus();
             }
@@ -105,47 +176,37 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.o
                 textView.setVisibility(View.GONE);
                 editText.setVisibility(View.VISIBLE);
                 addButton.setVisibility(View.VISIBLE);
-                cancelButton.setVisibility(View.VISIBLE);
-                inputMethodManager =  (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+                inputMethodManager =  (InputMethodManager)getActivity().getSystemService(INPUT_METHOD_SERVICE);
                 inputMethodManager.toggleSoftInputFromWindow(editText.getApplicationWindowToken(), InputMethodManager.SHOW_FORCED, 0);
                 editText.requestFocus();
             }
-        });  cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editText.getText().clear();
-                editText.setVisibility(View.INVISIBLE);
-                addButton.setVisibility(View.INVISIBLE);
-                cancelButton.setVisibility(View.INVISIBLE);
-                textView.setVisibility(View.VISIBLE);
-                inputMethodManager =  (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-                inputMethodManager.hideSoftInputFromWindow(cancelButton.getWindowToken(), 0);
-
-                fab.setVisibility(View.VISIBLE);
-            }
         });
-
+        return view;
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        recreate();
+    public void onResume() {
+        super.onResume();
+        if(shouldRefreshOnResume){
+            shouldRefreshOnResume = false;
+            getFragmentManager().beginTransaction().replace(R.id.container,new attendanceFragment()).commit();
+        }
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        if(!shouldRefreshOnResume)
+        shouldRefreshOnResume = true;
+    }
     public void setAdapter() {
-        adapter = new RecyclerAdapter(MainActivity.this, usersList, this, this);
+        adapter = new RecyclerAdapter(getActivity(), usersList, this, this);
         recyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         new ItemTouchHelper(callback).attachToRecyclerView(recyclerView);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
-    }
-
-    @Override
-    public void recreate() {
-        super.recreate();
     }
 
     @Override
@@ -158,27 +219,18 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.o
         adapter.notifyDataSetChanged();
         adapter.notifyItemChanged(position);
         intent = new Intent();
-        intent = new Intent(MainActivity.this, MainActivity2.class);
+        intent = new Intent(getContext(), MainActivity2.class);
         intent.putExtra("Send", table_name);
         startActivity(intent);
     }
-
     @Override
     public boolean onLongClick(int position) {
         return true;
     }
-
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finishAffinity();
-    }
-
     public void show() {
         Cursor cursor = db.showData();
         if (cursor.getCount() == 0) {
-            Toast.makeText(MainActivity.this, "No data", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "No data", Toast.LENGTH_SHORT).show();
         } else {
             while ((cursor.moveToNext())) {
                 User user = new User(cursor.getString(1), cursor.getInt(2), cursor.getInt(3),
@@ -201,7 +253,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.o
             subName = usersList.get(viewHolder.getAdapterPosition()).getSubjectName();
             item = viewHolder.getAdapterPosition();
 
-            new AlertDialog.Builder(MainActivity.this).
+            new AlertDialog.Builder(getContext()).
                     setIcon(android.R.drawable.ic_delete).
                     setTitle("Delete ").
                     setMessage("Are you want to delete this item?\nYou cannot undo this process.").
@@ -216,5 +268,4 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.o
             adapter.notifyDataSetChanged();
         }
     };
-
 }

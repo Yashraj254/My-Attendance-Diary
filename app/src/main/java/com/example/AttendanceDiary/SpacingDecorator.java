@@ -1,4 +1,4 @@
-package com.example.newrecylce;
+package com.example.AttendanceDiary;
 
 import android.graphics.Rect;
 import android.view.View;

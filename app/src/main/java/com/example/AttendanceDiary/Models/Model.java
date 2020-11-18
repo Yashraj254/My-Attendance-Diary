@@ -1,4 +1,4 @@
-package com.example.newrecylce.Models;
+package com.example.AttendanceDiary.Models;
 
 
 public class Model {

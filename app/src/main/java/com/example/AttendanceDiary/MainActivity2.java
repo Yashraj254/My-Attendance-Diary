@@ -1,8 +1,8 @@
-package com.example.newrecylce;
+package com.example.AttendanceDiary;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.content.Context;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -21,14 +21,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
-import com.example.newrecylce.Adapters.MyAdapter;
-import com.example.newrecylce.Models.Model;
-import com.example.newrecylce.Room.DbHelper;
+import com.example.AttendanceDiary.Adapters.MyAdapter;
+import com.example.AttendanceDiary.Models.Model;
+import com.example.AttendanceDiary.Room.DbHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
     FloatingActionButton fab;
     ImageButton backArrow;
     TextView subjectView, detailedView;
-
+    attendanceFragment fragment;
     public void onCreate(Bundle savedInstancedState) {
         super.onCreate(savedInstancedState);
         setContentView(R.layout.date_list);
@@ -80,7 +81,8 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
         backArrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity2.this, MainActivity.class));
+
+
                 finish();
             }
         });
@@ -106,7 +108,6 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
                             model = new Model(date);
                             userList.add(model);
                             Log.d(TAG, "onClick: " + date + " has been added to " + table_name);
-                            getData();
                             adapter.notifyDataSetChanged();
                             fab.setVisibility(View.GONE);
                         } else {
@@ -116,13 +117,13 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
                     }
                 }, year, month, day);
                 pickerDialog.show();
+                adapter.notifyDataSetChanged();
             }
         });
     }
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(MainActivity2.this, MainActivity.class));
         finish();
         super.onBackPressed();
     }
@@ -135,8 +136,8 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
         new ItemTouchHelper(callback).attachToRecyclerView(recyclerView);
         SpacingDecorator decorator = new SpacingDecorator(10);
         recyclerView.addItemDecoration(decorator);
-
         recyclerView.setAdapter(adapter);
+        recyclerView.setItemViewCacheSize(100);
     }
 
     public void show() {
@@ -176,6 +177,7 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
                 detail = "Your attendance is above 75%, Keep up!!!";
 
             detailedView.setText(detail);
+
             db.updateData(totalCount, table_name, totalPresent, totalAbsent, totalPercentage);
 
         } catch (Exception e) {
@@ -183,6 +185,7 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
             db.updateData(totalCount, table_name, totalPresent, totalAbsent, totalPercentage);
 
         }
+      //  adapter.notifyDataSetChanged();
     }
 
     private ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
@@ -208,7 +211,7 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
                                 userList.remove(item);
                                 getData();
                                 fab.setVisibility(View.VISIBLE);
-                                adapter.notifyDataSetChanged();
+                                adapter.notifyItemRemoved(item);
                             } catch (Exception e) {
                             }
                         }
