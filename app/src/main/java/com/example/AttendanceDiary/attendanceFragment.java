@@ -122,9 +122,7 @@ public class attendanceFragment extends Fragment implements RecyclerAdapter.onCl
         actionBar.setSupportActionBar(toolbar);
 
         Fragment attendanceFragment = new attendanceFragment();
-     /*   getFragmentManager().beginTransaction()
-                .replace(R.id.container,attendanceFragment,"ATTENDANCE")
-                .addToBackStack("YOUR_SOURCE_FRAGMENT_TAG").commit();*/
+
 
         DrawerLayout drawer = (DrawerLayout) actionBar.findViewById(R.id.draw_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(

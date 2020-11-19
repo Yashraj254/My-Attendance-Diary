@@ -52,7 +52,8 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
     int item, totalCount, totalPresent, totalAbsent, totalPercentage;
     FloatingActionButton fab;
     ImageButton backArrow;
-    TextView subjectView, detailedView;
+     TextView subjectView;
+     public static TextView detailedView;
     attendanceFragment fragment;
     public void onCreate(Bundle savedInstancedState) {
         super.onCreate(savedInstancedState);
@@ -127,9 +128,16 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
         finish();
         super.onBackPressed();
     }
-
+    public static  void update_counter(String value){
+        try{
+            detailedView.setText(value);
+        }
+        catch (Exception ex){
+            Log.d("Exception","Exception of type"+ex.getMessage());
+        }
+    }
     public void setAdapter() {
-        adapter = new MyAdapter(userList, this, this, this, newTable,fab);
+        adapter = new MyAdapter(userList, this, this, this, table_name,fab,detailedView);
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -176,6 +184,7 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
             else
                 detail = "Your attendance is above 75%, Keep up!!!";
 
+
             detailedView.setText(detail);
 
             db.updateData(totalCount, table_name, totalPresent, totalAbsent, totalPercentage);
@@ -211,12 +220,12 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
                                 userList.remove(item);
                                 getData();
                                 fab.setVisibility(View.VISIBLE);
-                                adapter.notifyItemRemoved(item);
+                               // adapter.notifyItemRemoved(item);
                             } catch (Exception e) {
                             }
                         }
                     }).setNegativeButton("No", null).show();
-            adapter.notifyDataSetChanged();
+           // adapter.notifyDataSetChanged();
         }
     };
 

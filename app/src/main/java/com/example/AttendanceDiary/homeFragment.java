@@ -1,13 +1,12 @@
 package com.example.AttendanceDiary;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,9 +16,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -27,12 +30,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.AttendanceDiary.Room.DbHelper;
 import com.google.android.material.navigation.NavigationView;
 import com.theartofdev.edmodo.cropper.CropImage;
-import com.theartofdev.edmodo.cropper.CropImageActivity;
 import com.theartofdev.edmodo.cropper.CropImageView;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -48,6 +46,7 @@ public class homeFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final int PICK_FILE_RESULT_CODE = 8778;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -56,19 +55,16 @@ public class homeFragment extends Fragment {
     TextView nameText, classText, enrollText, collegeText, header_name, header_enroll;
     String userName = "name", userClass, userEnroll = "Enroll No.", userCollege;
     NavigationView nav;
-    ActionBarDrawerToggle bar;
-    DrawerLayout layout;
     Toolbar toolbar;
     ImageView profile, save, edit, header_image;
-    private static final int PICK_IMAGE = 1;
-    Uri imageUri, resultUri;
-    Bitmap image, bmp;
+    Uri imageUri, resultUri, uri;
     DbHelper db;
     private static final String TAG = "homeFragment";
-    byte[] pic;
+    String pic;
     Exception error;
     View header;
-    public static final int ACCESS_FILE = 43;
+    String imagePath;
+    private static final int STORAGE_PERMISSION_CODE = 101;
 
     public homeFragment() {
         // Required empty public constructor
@@ -128,7 +124,6 @@ public class homeFragment extends Fragment {
         header_image = header.findViewById(R.id.header_image);
 
 
-
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_menu_24);
@@ -141,15 +136,11 @@ public class homeFragment extends Fragment {
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         db = new DbHelper(getContext());
-        try {
-            show();
-            header_name.setText(userName);
-            header_enroll.setText(userEnroll);
-            if (bmp != null)
-                header_image.setImageBitmap(bmp);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        show();
+        header_name.setText(userName);
+        header_enroll.setText(userEnroll);
+        if (pic != null)
+            header_image.setImageURI(Uri.parse(pic));
         if (db.countTable3() == 0) {
             Log.d(TAG, "if: " + db.countTable3());
             name.setVisibility(View.VISIBLE);
@@ -184,7 +175,6 @@ public class homeFragment extends Fragment {
             userEnroll = enrollNo.getText().toString();
             userCollege = college.getText().toString();
 
-
             if (userName.isEmpty() || userClass.isEmpty() || userEnroll.isEmpty() || userCollege.isEmpty()) {
                 Toast.makeText(getContext(), "Fill the empty field", Toast.LENGTH_SHORT).show();
             } else {
@@ -200,18 +190,10 @@ public class homeFragment extends Fragment {
                 classText.setVisibility(View.VISIBLE);
                 enrollText.setVisibility(View.VISIBLE);
                 collegeText.setVisibility(View.VISIBLE);
-
                 db.clearAll();
-
                 ft.detach(this).attach(this).commit();
-                db.insertUserDetails(userName, userClass, userEnroll, userCollege, imageViewToByte(profile));
-
-                Log.d(TAG, "onCreateView: "+imageViewToByte(profile));
-                try {
-                    show();
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+                db.insertUserDetails(userName, userClass, userEnroll, userCollege, imagePath);
+                show();
             }
 
         });
@@ -236,62 +218,53 @@ public class homeFragment extends Fragment {
                 profile.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        openGallery();
+                        checkPermission(
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                STORAGE_PERMISSION_CODE);
+
 
                     }
                 });
             }
         });
-
         return view;
     }
 
-    public byte[] imageViewToByte(ImageView img) {
-        if (image != null) {
-            image = ((BitmapDrawable) img.getDrawable()).getBitmap();
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            image.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            byte[] byteArray = stream.toByteArray();
-            return byteArray;
-        } else
-            return null;
-    }
-
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == ACCESS_FILE && resultCode == RESULT_OK && data != null && data.getData() != null) {
+        if (requestCode == PICK_FILE_RESULT_CODE && resultCode == RESULT_OK) {
             imageUri = data.getData();
+            Log.d(TAG, "getPath: " + imageUri);
             CropImage.activity(imageUri).setGuidelines(CropImageView.Guidelines.ON).
                     setActivityTitle("Crop image").setCropShape(CropImageView.CropShape.OVAL).setAspectRatio(1, 1).
                     setCropMenuCropButtonTitle("Done").start(getContext(), this);
-
-            try {
-                image = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imageUri);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            imagePath = imageUri.toString();
+            profile.setImageURI(Uri.parse(imagePath));
         }
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
                 resultUri = result.getUri();
-                profile.setImageURI(resultUri);
+                imagePath = resultUri.toString();
+                profile.setImageURI(Uri.parse(imagePath));
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE)
                 error = result.getError();
         }
     }
 
     private void openGallery() {
-        Intent gallery = new Intent();
-        gallery.setType("image/*");
-        gallery.setAction(Intent.ACTION_PICK);
-        startActivityForResult(Intent.createChooser(gallery, "Gallery"), ACCESS_FILE);
+        Intent gallery = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        gallery.addCategory(Intent.CATEGORY_OPENABLE);
+        gallery.setType("*/*");
+        startActivityForResult(gallery, PICK_FILE_RESULT_CODE);
     }
 
-    public void show() throws UnsupportedEncodingException {
+
+    public void show() {
         Cursor cursor = db.showUserDetails();
 
         if (cursor.getCount() == 0) {
@@ -302,17 +275,42 @@ public class homeFragment extends Fragment {
                 userClass = cursor.getString(2);
                 userEnroll = cursor.getString(3);
                 userCollege = cursor.getString(4);
-                pic = cursor.getBlob(5);
-                Log.d(TAG, "show: "+pic);
+                pic = cursor.getString(5);
+                Log.d(TAG, "show: " + pic);
             }
             if (pic != null)
-                bmp = BitmapFactory.decodeByteArray(pic, 0, pic.length);
+                profile.setImageURI(Uri.parse(pic));
             nameText.setText(userName);
             classText.setText(userClass);
             enrollText.setText(userEnroll);
             collegeText.setText(userCollege);
-            if (bmp != null)
-                profile.setImageBitmap(bmp);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == STORAGE_PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getContext(), "Storage Permission Granted", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "Storage Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    public void checkPermission(String permission, int requestCode)
+    {
+        if (ContextCompat.checkSelfPermission(getContext(), permission) == PackageManager.PERMISSION_DENIED) {
+
+            // Requesting the permission
+            ActivityCompat.requestPermissions(getActivity(), new String[] { permission }, requestCode);
+        }
+        else {
+
+            openGallery();
         }
     }
 }

@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.AttendanceDiary.MainActivity2;
 import com.example.AttendanceDiary.Models.Model;
 import com.example.AttendanceDiary.R;
 import com.example.AttendanceDiary.Room.DbHelper;
@@ -28,12 +29,14 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     String table_name,newTable;
     DbHelper db;
     private static final String TAG = "MyAdapter";
+    MainActivity2 myActivity;
     Context context;
     Model model;
     int status, totalCount, totalPresent, totalAbsent, totalPercentage;
     FloatingActionButton fab;
-
-    public MyAdapter(ArrayList<Model> userList, onClickListener clickListener, onLongClickListener longClickListener, Context context, String table_name, FloatingActionButton fab) {
+    String detail;
+    public MyAdapter(ArrayList<Model> userList, onClickListener clickListener, onLongClickListener longClickListener,
+                     Context context, String table_name, FloatingActionButton fab, TextView detailedView) {
 
         this.userList = userList;
         this.context = context;
@@ -41,6 +44,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         this.clickListener = clickListener;
         this.longClickListener = longClickListener;
         this.fab = fab;
+        this.detailedView = detailedView;
         db = new DbHelper(context);
     }
 
@@ -107,7 +111,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                         status = 1;
                         db.addDateData(date, status);
                         getData();
-                        notifyDataSetChanged();
                         holder.absent.setEnabled(false);
                         fab.setVisibility(View.VISIBLE);
 
@@ -118,7 +121,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                         model = new Model(status);
                         db.addDateData(date, status);
                         getData();
-                        notifyDataSetChanged();
                         holder.present.setEnabled(false);
                         fab.setVisibility(View.VISIBLE);
 
@@ -129,14 +131,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     }
 
     public void getData() {
-        newTable = table_name;
-        table_name = table_name.replaceAll("[^a-zA-Z0-9]", "");
         totalCount = db.totalCount(table_name);
         totalAbsent = db.getAbsentCount(table_name);
         totalPresent = db.getPresentCount(table_name);
         totalPercentage = 0;
 
-        String detail;
         try {
             totalPercentage = totalPresent * 100 / totalCount;
             double requiredAttendance = ((0.75 * totalCount) - totalPresent)/0.25;
@@ -146,13 +145,15 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             else
                 detail = "Your attendance is above 75%, Keep up!!!";
 
-            detailedView.setText(detail);
+            MainActivity2.update_counter(detail);
 
+            notifyDataSetChanged();
             Log.d(TAG, "Total Count: "+totalCount+" Total Present: "+totalPresent+" Total Absent: "+totalAbsent);
-            db.updateData(totalCount, newTable, totalPresent, totalAbsent, totalPercentage);
+            db.updateData(totalCount, table_name, totalPresent, totalAbsent, totalPercentage);
 
         } catch (Exception e) {
-            Log.d(TAG, "Table name: "+table_name+" Total Count: "+totalCount+" Total Present: "+totalPresent+" Total Absent: "+totalAbsent);
+            Log.d(TAG, "Detail: "+detail);
+            Log.d(TAG, "Error generated Table name: "+table_name+" Total Count: "+totalCount+" Total Present: "+totalPresent+" Total Absent: "+totalAbsent);
             db.updateData(totalCount, newTable, totalPresent, totalAbsent, totalPercentage);
         }
 

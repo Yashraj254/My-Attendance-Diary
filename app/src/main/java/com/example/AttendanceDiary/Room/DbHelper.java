@@ -49,7 +49,7 @@ public class DbHelper extends SQLiteOpenHelper {
         db.execSQL("Create table if not exists " + TABLE_NAME1 + "(" + id0 + " integer primary key autoincrement," + subjectName1 + " TEXT, " + total4 + " int,"
                 + present2 + " int, " + absent3 + " int, " + percentage5 + " int);");
         db.execSQL("Create table if not exists " + TABLE_NAME3 + "(" + id0 + " integer primary key autoincrement," + name1 + " TEXT, " + standard2 + " TEXT,"
-                + enrollNo3 + " TEXT, " + college4 + " TEXT, "+image5+" BLOB);");
+                + enrollNo3 + " TEXT, " + college4 + " TEXT, "+image5+" TEXT);");
 
         Toast.makeText(context, "Created: " + TABLE_NAME1, Toast.LENGTH_SHORT).show();
     }
@@ -79,7 +79,7 @@ public class DbHelper extends SQLiteOpenHelper {
             Toast.makeText(context, "Succeed", Toast.LENGTH_SHORT).show();
     }
 
-    public void insertUserDetails(String name, String standard, String enrollNo, String college, byte[] image)
+    public void insertUserDetails(String name, String standard, String enrollNo, String college, String image)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -197,5 +197,13 @@ public class DbHelper extends SQLiteOpenHelper {
         values.put(total4, total);
         values.put(percentage5, percentage);
         db.update(TABLE_NAME1, values, subjectName1 + "=?", new String[]{subName});
+    }
+    public  void updateDate(String table_name,String date,int status)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(date6,date);
+        values.put(status7,status);
+        db.update(table_name, values, date6 + "=?", new String[]{date});
     }
 }
