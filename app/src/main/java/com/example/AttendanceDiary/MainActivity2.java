@@ -2,9 +2,7 @@ package com.example.AttendanceDiary;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.FragmentTransaction;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,38 +10,28 @@ import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.ViewPager;
-
 import com.example.AttendanceDiary.Adapters.MyAdapter;
 import com.example.AttendanceDiary.Models.Model;
 import com.example.AttendanceDiary.Room.DbHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 
 
-public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClickListener, MyAdapter.onLongClickListener {
+public class MainActivity2 extends AppCompatActivity {
 
     private static final String TAG = "Main Activity2";
     Model model;
     String date, table_name, detail, newTable;
-    private RadioGroup radioGroup;
-    private RadioButton present, absent;
-    Intent intent;
     ArrayList<Model> userList;
     RecyclerView recyclerView;
     MyAdapter adapter;
@@ -52,9 +40,9 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
     int item, totalCount, totalPresent, totalAbsent, totalPercentage;
     FloatingActionButton fab;
     ImageButton backArrow;
-     TextView subjectView;
-     public static TextView detailedView;
-    attendanceFragment fragment;
+    TextView subjectView;
+    public static TextView detailedView;
+
     public void onCreate(Bundle savedInstancedState) {
         super.onCreate(savedInstancedState);
         setContentView(R.layout.date_list);
@@ -82,8 +70,6 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
         backArrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
                 finish();
             }
         });
@@ -110,9 +96,9 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
                             userList.add(model);
                             Log.d(TAG, "onClick: " + date + " has been added to " + table_name);
                             adapter.notifyDataSetChanged();
-                            fab.setVisibility(View.GONE);
+                           // fab.setVisibility(View.GONE);
                         } else {
-                            Toast.makeText(getApplicationContext(), "Can't be added", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), "Selected date already exists.", Toast.LENGTH_LONG).show();
                         }
 
                     }
@@ -128,16 +114,17 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
         finish();
         super.onBackPressed();
     }
-    public static  void update_counter(String value){
-        try{
+
+    public static void update_counter(String value) {
+        try {
             detailedView.setText(value);
-        }
-        catch (Exception ex){
-            Log.d("Exception","Exception of type"+ex.getMessage());
+        } catch (Exception ex) {
+            Log.d("Exception", "Exception of type" + ex.getMessage());
         }
     }
+
     public void setAdapter() {
-        adapter = new MyAdapter(userList, this, this, this, table_name,fab,detailedView);
+        adapter = new MyAdapter(userList, this, table_name, fab);
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -145,7 +132,7 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
         SpacingDecorator decorator = new SpacingDecorator(10);
         recyclerView.addItemDecoration(decorator);
         recyclerView.setAdapter(adapter);
-        recyclerView.setItemViewCacheSize(100);
+        recyclerView.setItemViewCacheSize(userList.size());
     }
 
     public void show() {
@@ -158,16 +145,6 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
                 userList.add(model);
             }
         }
-    }
-
-    @Override
-    public void onClick(int position) {
-    }
-
-    @Override
-    public boolean onLongClick(final int position) {
-
-        return true;
     }
 
     public void getData() {
@@ -194,7 +171,7 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
             db.updateData(totalCount, table_name, totalPresent, totalAbsent, totalPercentage);
 
         }
-      //  adapter.notifyDataSetChanged();
+
     }
 
     private ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
@@ -220,13 +197,11 @@ public class MainActivity2 extends AppCompatActivity implements MyAdapter.onClic
                                 userList.remove(item);
                                 getData();
                                 fab.setVisibility(View.VISIBLE);
-                               // adapter.notifyItemRemoved(item);
+                                adapter.notifyItemRemoved(item);
                             } catch (Exception e) {
                             }
                         }
                     }).setNegativeButton("No", null).show();
-           // adapter.notifyDataSetChanged();
         }
     };
-
 }

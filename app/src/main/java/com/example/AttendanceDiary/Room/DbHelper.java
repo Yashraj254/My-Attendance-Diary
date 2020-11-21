@@ -34,13 +34,12 @@ public class DbHelper extends SQLiteOpenHelper {
     public static final String  enrollNo3 = "enrollNo";
     public static final String  college4 = "college";
     public static final String image5 = "image";
-    private byte[] imageInByte;
+
     Context context;
 
     public DbHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, 1);
         this.context = context;
-
     }
 
     @Override
@@ -51,7 +50,6 @@ public class DbHelper extends SQLiteOpenHelper {
         db.execSQL("Create table if not exists " + TABLE_NAME3 + "(" + id0 + " integer primary key autoincrement," + name1 + " TEXT, " + standard2 + " TEXT,"
                 + enrollNo3 + " TEXT, " + college4 + " TEXT, "+image5+" TEXT);");
 
-        Toast.makeText(context, "Created: " + TABLE_NAME1, Toast.LENGTH_SHORT).show();
     }
 
     public void createTable(String tableName) {
@@ -197,13 +195,5 @@ public class DbHelper extends SQLiteOpenHelper {
         values.put(total4, total);
         values.put(percentage5, percentage);
         db.update(TABLE_NAME1, values, subjectName1 + "=?", new String[]{subName});
-    }
-    public  void updateDate(String table_name,String date,int status)
-    {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(date6,date);
-        values.put(status7,status);
-        db.update(table_name, values, date6 + "=?", new String[]{date});
     }
 }

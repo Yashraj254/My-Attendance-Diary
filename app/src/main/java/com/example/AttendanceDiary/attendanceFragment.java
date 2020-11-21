@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -42,7 +44,7 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
  * Use the {@link attendanceFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class attendanceFragment extends Fragment implements RecyclerAdapter.onClickListener, RecyclerAdapter.onLongClickListener{
+public class attendanceFragment extends Fragment implements RecyclerAdapter.onClickListener{
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -97,8 +99,6 @@ public class attendanceFragment extends Fragment implements RecyclerAdapter.onCl
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
-
-
         }
     }
 
@@ -121,10 +121,7 @@ public class attendanceFragment extends Fragment implements RecyclerAdapter.onCl
         AppCompatActivity actionBar = (AppCompatActivity) getActivity();
         actionBar.setSupportActionBar(toolbar);
 
-        Fragment attendanceFragment = new attendanceFragment();
-
-
-        DrawerLayout drawer = (DrawerLayout) actionBar.findViewById(R.id.draw_layout);
+        DrawerLayout drawer = actionBar.findViewById(R.id.draw_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 getActivity(), drawer, toolbar, R.string.open, R.string.close);
         drawer.addDrawerListener(toggle);
@@ -139,6 +136,7 @@ public class attendanceFragment extends Fragment implements RecyclerAdapter.onCl
         adapter.notifyDataSetChanged();
 
         addButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onClick(View v) {
                 subName = editText.getText().toString();
@@ -147,15 +145,26 @@ public class attendanceFragment extends Fragment implements RecyclerAdapter.onCl
                 int absent = 0;
                 int percentage = 0;
                 User user = new User(subName, count, present, absent, percentage);
+               User matched = usersList.stream().filter(user1 -> user1.getSubjectName().equals(subName)).
+                       findFirst().orElse(null);
                 if (subName.trim().isEmpty())
+
                     Toast.makeText(getContext(), "Enter something", Toast.LENGTH_SHORT).show();
-                else {
-                    //  subName = subName.replaceAll(" ","");
+                else if(!subName.matches("^[a-zA-Z].*$")) {
+                    Log.d(TAG, "Subject Name: " + subName);
+                    Toast.makeText(getContext(), "Start using: a~z or A~Z", Toast.LENGTH_SHORT).show();
+                }
+                else if(matched == null){
+
                     db.insertData(subName.trim(), count, present, absent, percentage);
                     usersList.add(user);
                     adapter.notifyDataSetChanged();
+                    Log.d(TAG, "onClick: " + subName + " has been added to " + db.TABLE_NAME1);
+
                 }
-                Log.d(TAG, "onClick: " + subName + " has been added to " + db.TABLE_NAME1);
+                else{
+                    Toast.makeText(getContext(), "Subject with same name already exists.", Toast.LENGTH_LONG).show();
+                }
 
                 editText.getText().clear();
                 editText.setVisibility(View.INVISIBLE);
@@ -198,7 +207,7 @@ public class attendanceFragment extends Fragment implements RecyclerAdapter.onCl
         shouldRefreshOnResume = true;
     }
     public void setAdapter() {
-        adapter = new RecyclerAdapter(getActivity(), usersList, this, this);
+        adapter = new RecyclerAdapter(getActivity(), usersList, this);
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         new ItemTouchHelper(callback).attachToRecyclerView(recyclerView);
@@ -221,10 +230,7 @@ public class attendanceFragment extends Fragment implements RecyclerAdapter.onCl
         intent.putExtra("Send", table_name);
         startActivity(intent);
     }
-    @Override
-    public boolean onLongClick(int position) {
-        return true;
-    }
+
     public void show() {
         Cursor cursor = db.showData();
         if (cursor.getCount() == 0) {

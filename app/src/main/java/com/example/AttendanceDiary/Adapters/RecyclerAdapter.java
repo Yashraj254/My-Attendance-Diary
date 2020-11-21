@@ -20,32 +20,28 @@ import java.util.ArrayList;
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyViewHolder> {
     private ArrayList<User> userList;
     private onClickListener clickListener;
-    private onLongClickListener longClickListener;
     Activity activity;
     private static final String TAG = "RecyclerAdapter";
     DbHelper db;
     Context context;
 
-    public RecyclerAdapter(Activity activity, ArrayList<User> userList, onClickListener clickListener, onLongClickListener longClickListener) {
+    public RecyclerAdapter(Activity activity, ArrayList<User> userList, onClickListener clickListener) {
         db = new DbHelper(context);
         this.activity = activity;
         this.userList = userList;
         this.clickListener = clickListener;
-        this.longClickListener = longClickListener;
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView subject, total, present, absent,percentage;
         ProgressBar percentage_bar;
         private onClickListener clickListener;
-        private onLongClickListener longClickListener;
 
-
-        public MyViewHolder(@NonNull final View view, onClickListener clickListener, onLongClickListener longClickListener) {
+        public MyViewHolder(@NonNull final View view, onClickListener clickListener) {
             super(view);
 
             this.clickListener = clickListener;
-            this.longClickListener = longClickListener;
+
             subject = view.findViewById(R.id.subject);
             total = view.findViewById(R.id.total);
             present = view.findViewById(R.id.present);
@@ -53,7 +49,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             percentage = view.findViewById(R.id.percentage);
             percentage_bar = view.findViewById(R.id.percentage_bar);
             view.setOnClickListener(this);
-            view.setOnLongClickListener(this);
         }
 
         @Override
@@ -61,11 +56,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             clickListener.onClick(getAdapterPosition());
         }
 
-        @Override
-        public boolean onLongClick(View v) {
-            longClickListener.onLongClick(getAdapterPosition());
-            return true;
-        }
     }
 
     @NonNull
@@ -73,7 +63,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
     public RecyclerAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.subject_items, parent, false);
 
-        return new MyViewHolder(itemView, clickListener, longClickListener);
+        return new MyViewHolder(itemView, clickListener);
     }
 
     @Override
@@ -102,7 +92,4 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         void onClick(int position);
     }
 
-    public interface onLongClickListener {
-        boolean onLongClick(int position);
-    }
 }

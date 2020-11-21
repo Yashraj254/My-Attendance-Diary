@@ -3,7 +3,6 @@ package com.example.AttendanceDiary.Models;
 
 public class Model {
 
-
     private String date;
     private int status;
 
@@ -35,6 +34,7 @@ public class Model {
     public void setStatus(int status) {
         this.status = status;
     }
+
 }
 
 

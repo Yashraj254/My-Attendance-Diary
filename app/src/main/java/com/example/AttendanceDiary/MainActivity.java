@@ -33,14 +33,9 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         nav = findViewById(R.id.nav_menu);
         layout = findViewById(R.id.draw_layout);
-
         header = nav.getHeaderView(0);
-
-
         setSupportActionBar(toolbar);
         bar = new ActionBarDrawerToggle(this,layout,toolbar,R.string.open,R.string.close);
-
-
         layout.addDrawerListener(bar);
         bar.syncState();
         bar.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.white_translucent));
@@ -54,20 +49,14 @@ public class MainActivity extends AppCompatActivity {
                 {
                     case R.id.nav_home:
                         temp = new homeFragment();
-                        Toast.makeText(getApplicationContext(),"Home",Toast.LENGTH_SHORT).show();
-
                         break;
                     case R.id.nav_attendance:
                         temp = new attendanceFragment();
-                        Toast.makeText(getApplicationContext(),"Attendance",Toast.LENGTH_SHORT).show();
-
                         break;
                 }
                 getSupportFragmentManager().beginTransaction().replace(R.id.container,temp).commit();
                 layout.closeDrawer(GravityCompat.START);
                 return true;}
         });
-
-
     }
 }
