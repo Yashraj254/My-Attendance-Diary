@@ -119,6 +119,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="30dp"
         android:clickable="true"
+        app:tint="@color/white_translucent"
         android:src="@drawable/ic_baseline_add_24"
         app:backgroundTint="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="@+id/recyclerView"

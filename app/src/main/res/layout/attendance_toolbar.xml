@@ -14,6 +14,7 @@
         android:layout_marginRight="8dp"
         android:background="#FFFFFF"
         android:ems="10"
+        android:maxLength="45"
         android:hint="Enter subject..."
         android:inputType="textPersonName"
         android:textColorHint="#ED0909"

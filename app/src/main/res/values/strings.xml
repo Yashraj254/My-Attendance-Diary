@@ -1,8 +1,14 @@
 <resources>
-    <string name="app_name">NewREcylce</string>
+    <string name="app_name">My Attendance Diary</string>
     <string name="open">Open</string>
     <string name="close">Close</string>
+    <string name="ExistingUser"><u>Existing User? SignIn</u></string>
+    <string name="SignUp"><u>New User? SignUp </u></string>
+    <string name="ForgotPassword"><u>Forgot Password? </u></string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="warning">Are you sure you want to delete your account?\n You will lose all your data, you cannot undo this process.</string>
+    <string name="Confirm">Please type in <b>\"CONFIRM\"</b> to delete your account.</string>
 
 </resources>

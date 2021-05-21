@@ -7,4 +7,10 @@
     <item android:id="@+id/nav_attendance"
         android:icon="@drawable/ic_baseline_attendance_24"
         android:title="Attendance"/>
+    <item android:id="@+id/nav_logout"
+        android:icon="@drawable/ic_baseline_keyboard_backspace_24"
+        android:title="Logout"/>
+    <item android:id="@+id/nav_delete"
+        android:icon="@drawable/ic_baseline_delete_forever_24"
+        android:title="Delete Account"/>
 </menu>
